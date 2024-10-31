@@ -1,0 +1,45 @@
+@startuml
+class Utilisateur {
+    +id: int
+    +nom: string
+    +email: string
+    +mot_de_passe: string
+    +s'inscrire(nom: string, email: string, mot_de_passe: string): void
+    +se_connecter(email: string, mot_de_passe: string): boolean
+    +voirFormations(): List<Programme>
+    +acheterProgramme(programme_id: int): boolean
+}
+
+class Programme {
+    +id: int
+    +titre: string
+    +description: string
+    +prix: float
+    +duree: int
+    +ajouterAvis(utilisateur_id: int, commentaire: string, note: int): void
+    +getAvis(): List<Avis>
+}
+
+class Avis {
+    +id: int
+    +utilisateur_id: int
+    +programme_id: int
+    +commentaire: string
+    +note: int
+    +date_avis: date
+    +getDetails(): string
+}
+
+class Achat {
+    +id: int
+    +utilisateur_id: int
+    +programme_id: int
+    +date_achat: date
+    +getDetails(): string
+}
+
+Utilisateur "1" -- "0..*" Avis
+Programme "1" -- "0..*" Avis
+Utilisateur "1" -- "0..*" Achat
+Programme "1" -- "0..*" Achat
+@enduml
