@@ -1,0 +1,23 @@
+security:
+    # Définition des hashers de mot de passe
+    password_hashers:
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+
+    # Définition des fournisseurs d'utilisateur
+    providers:
+        users_in_memory: { memory: null }
+
+    # Définition des firewalls
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+        main:
+            lazy: true
+            provider: users_in_memory
+
+    # Contrôle d'accès
+    access_control:
+        # Exemple de contrôle d'accès
+        # - { path: ^/admin, roles: ROLE_ADMIN }
+        # - { path: ^/profile, roles: ROLE_USER }

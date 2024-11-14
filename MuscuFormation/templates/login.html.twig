@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion</title>
+    <style>
+        /* Style global pour le fond de la page */
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #0a0a0a; /* Fond noir profond */
+            font-family: Arial, sans-serif;
+        }
+
+        /* Conteneur pour centrer le formulaire et le titre */
+        .form-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        /* Style pour le conteneur du formulaire */
+        .login-container {
+            width: 50%;
+            max-width: 400px;
+            padding: 30px;
+            background-color: #1c1c1c; /* Noir légèrement plus clair pour le contraste */
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+
+        /* Style pour le titre */
+        h1 {
+            color: #ffffff;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        /* Style des messages d'erreur */
+        .error-message {
+            color: red;
+            margin-bottom: 15px;
+        }
+
+        /* Style des champs du formulaire */
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            color: #fffff; /* Couleur du texte en blanc */
+            background-color: #2e2e2e !important; /* Conserve le fond sombre */
+            border: 1px solid #444444;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus,
+        .form-control:focus {
+            outline: none;
+            border-color: #5cd65c; /* Vert pour indiquer le focus */
+        }
+
+        /* Style pour les boutons */
+        button {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            color: #ffffff;
+            background-color: #5cd65c;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #45b345; /* Vert foncé au survol */
+        }
+
+        /* Style pour le lien de redirection */
+        .register-link {
+            margin-top: 15px;
+        }
+
+        .register-link a {
+            color: #5cd65c;
+            text-decoration: none;
+        }
+
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-wrapper">
+        <h1>Connexion</h1>
+        
+        {# Affiche les messages d'erreur #}
+        {% for message in app.flashes('error') %}
+            <div class="error-message">{{ message }}</div>
+        {% endfor %}
+
+        <div class="login-container">
+            {{ form_start(form) }}
+                {{ form_widget(form) }}
+                <button type="submit">Se connecter</button> {# Bouton de connexion #}
+            {{ form_end(form) }}
+
+            {# Bouton pour rediriger vers la page d'inscription #}
+            <p class="register-link">
+                <a href="{{ path('register') }}">
+                    S'inscrire
+                </a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

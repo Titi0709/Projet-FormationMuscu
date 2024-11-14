@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formations</title>
+    <style>
+        /* Style global pour le fond de la page */
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #0a0a0a; /* Fond noir profond */
+            font-family: Arial, sans-serif;
+            flex-direction: column;
+            color: white;
+        }
+
+        /* Conteneur principal de la page */
+        .form-wrapper {
+            display: flex;
+            justify-content: space-between;
+            width: 80%;
+            height: 80vh;
+            max-width: 1200px;
+        }
+
+        /* Style pour la première colonne (Prise de masse) */
+        .column {
+            width: 48%;
+            background-color: #2e2e2e; /* Un fond un peu plus clair */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+
+        /* Style pour l'image de chaque colonne */
+        .column img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        /* Titre de chaque colonne */
+        .column h2 {
+            color: #5cd65c;
+            font-size: 22px;
+            margin-bottom: 15px;
+        }
+
+        /* Liste des informations sous forme de "-" */
+        .column ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .column ul li {
+            margin: 10px 0;
+            font-size: 14px;
+        }
+
+        /* Style pour les boutons */
+        .column button {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            color: #ffffff;
+            background-color: #5cd65c;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 20px;
+        }
+
+        .column button:hover {
+            background-color: #45b345; /* Vert foncé au survol */
+        }
+
+    </style>
+</head>
+<body>
+    <h1>Formations</h1>
+    <div class="form-wrapper">
+        <!-- Première colonne: Prise de masse -->
+        <div class="column">
+            <img src="https://www.amnutrition.fr/cdn/shop/articles/Homme_prise_de_masse.jpg?v=1701786058&width=1920" alt="Prise de masse" style="width: 500px; height: 300px;">
+
+            <h2>Prise de Masse</h2>
+            <ul>
+                <li>- Programme de musculation adapté</li>
+                <li>- Nutrition pour favoriser la prise de muscle</li>
+                <li>- Séances d'entraînement hebdomadaires</li>
+                <li>- Suivi personnalisé</li>
+            </ul>
+            <button>Acheter la formation</button>
+        </div>
+
+        <!-- Deuxième colonne: Séchage -->
+        <div class="column">
+            <img src="https://www.fitadium.com/conseils/wp-content/uploads/2020/05/supplements-prise-de-masse.jpg" alt="Séchage" style="width: 500px; height: 300px;">
+            <h2>Séchage</h2>
+            <ul>
+                <li>- Programme de musculation pour affiner la silhouette</li>
+                <li>- Plan alimentaire pour optimiser la perte de graisse</li>
+                <li>- Entraînements cardio et renforcement</li>
+                <li>- Suivi mensuel</li>
+            </ul>
+            <button>Acheter la formation</button>
+        </div>
+    </div>
+</body>
+</html>
