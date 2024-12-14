@@ -1,0 +1,25 @@
+{# templates/Masse/programme_detail.html.twig #}
+
+<h1>Programme: {{ programme.nom }}</h1>
+<p>{{ programme.description }}</p>
+<p>Prix: {{ programme.prix }}€</p>
+
+<h2>Avis</h2>
+{% for avis in programme.avis %}
+    <div>
+        <p><strong>{{ avis.utilisateur.username }}:</strong> {{ avis.contenu }}</p>
+        <a href="{{ path('Masse_supprimer_avis', {'id': avis.id}) }}">Supprimer</a>
+    </div>
+{% endfor %}
+
+<h3>Ajouter un avis</h3>
+<form action="{{ path('Masse_ajouter_avis', {'id': programme.id}) }}" method="POST">
+    <textarea name="avis" required></textarea>
+    <button type="submit">Ajouter un avis</button>
+</form>
+
+<h3>Payer le programme</h3>
+<form action="{{ path('Masse_payer_programme', {'id': programme.id}) }}" method="POST">
+    <input type="hidden" name="payment_success" value="true" />  {# Remplacez cette logique avec votre système de paiement #}
+    <button type="submit">Payer maintenant</button>
+</form>

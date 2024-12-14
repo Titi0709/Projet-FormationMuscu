@@ -52,11 +52,12 @@ class ProgrammeController extends AbstractController
             return $this->redirectToRoute('login');
         }
 
-        // Récupérer les programmes à afficher
-        $programmes = $entityManager->getRepository(Programme::class)->findAll();
+         // Récupérer le programme en fonction de son ID
+         $programmes = $entityManager->getRepository(Programme::class)->findAll();
 
         return $this->render('formations.html.twig', [
             'programmes' => $programmes,
         ]);
     }
+
 }

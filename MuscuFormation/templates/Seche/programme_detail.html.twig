@@ -1,0 +1,25 @@
+{# templates/Seche/formation_detail.html.twig #}
+
+<h1>Formation: {{ programme.nom }}</h1>  {# Utilisez 'programme' au lieu de 'formation' #}
+<p>{{ programme.description }}</p>
+<p>Prix: {{ programme.prix }}€</p>
+
+<h2>Avis</h2>
+{% for avis in programme.avis %}
+    <div>
+        <p><strong>{{ avis.utilisateur.username }}:</strong> {{ avis.contenu }}</p>
+        <a href="{{ path('Seche_supprimer_avis', {'id': avis.id}) }}">Supprimer</a>
+    </div>
+{% endfor %}
+
+<h3>Ajouter un avis</h3>
+<form action="{{ path('Seche_ajouter_avis', {'id': programme.id}) }}" method="POST">
+    <textarea name="avis" required></textarea>
+    <button type="submit">Ajouter un avis</button>
+</form>
+
+<h3>Payer la formation</h3>
+<form action="{{ path('Seche_payer_formation', {'id': programme.id}) }}" method="POST">
+    <input type="hidden" name="payment_success" value="true" />  {# Remplacez cette logique avec votre système de paiement #}
+    <button type="submit">Payer maintenant</button>
+</form>

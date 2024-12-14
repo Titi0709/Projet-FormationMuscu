@@ -82,37 +82,50 @@
             background-color: #45b345; /* Vert foncé au survol */
         }
 
+        /* Style pour le bouton de déconnexion */
+        .logout-button {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            color: #ffffff;
+            background-color: #d9534f; /* Couleur rouge pour la déconnexion */
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 20px;
+        }
+
+        .logout-button:hover {
+            background-color: #c9302c; /* Rouge plus foncé au survol */
+        }
+
     </style>
 </head>
 <body>
     <h1>Formations</h1>
     <div class="form-wrapper">
-        <!-- Première colonne: Prise de masse -->
+        {% for programme in programmes %}
+        <!-- Première colonne: Dynamique selon le programme -->
         <div class="column">
-            <img src="https://www.amnutrition.fr/cdn/shop/articles/Homme_prise_de_masse.jpg?v=1701786058&width=1920" alt="Prise de masse" style="width: 500px; height: 300px;">
-
-            <h2>Prise de Masse</h2>
+            <img src="https://www.fitadium.com/conseils/wp-content/uploads/2020/05/supplements-prise-de-masse.jpg" alt="{{ programme.titre }}" style="width: 500px; height: 300px;">
+            <h2>{{ programme.titre }}</h2>
             <ul>
-                <li>- Programme de musculation adapté</li>
-                <li>- Nutrition pour favoriser la prise de muscle</li>
-                <li>- Séances d'entraînement hebdomadaires</li>
-                <li>- Suivi personnalisé</li>
+                <li>- {{ programme.description }}</li>
             </ul>
-            <button>Acheter la formation</button>
-        </div>
+             <form action="{% if programme.titre == 'Séche' %}{{ path('Seche_programme', {'id': 1}) }}{% else %}{{  path('Masse_programme', {'id': 2}) }}{% endif %}" method="get">
+                <button type="submit">Acheter la formation</button>
+            </form>
 
-        <!-- Deuxième colonne: Séchage -->
-        <div class="column">
-            <img src="https://www.fitadium.com/conseils/wp-content/uploads/2020/05/supplements-prise-de-masse.jpg" alt="Séchage" style="width: 500px; height: 300px;">
-            <h2>Séchage</h2>
-            <ul>
-                <li>- Programme de musculation pour affiner la silhouette</li>
-                <li>- Plan alimentaire pour optimiser la perte de graisse</li>
-                <li>- Entraînements cardio et renforcement</li>
-                <li>- Suivi mensuel</li>
-            </ul>
-            <button>Acheter la formation</button>
         </div>
+        {% endfor %}
     </div>
+
+
+
+    <!-- Bouton de déconnexion -->
+    <form action="{{ path('login') }}" method="post">
+        <button type="submit" class="logout-button">Déconnexion</button>
+    </form>
 </body>
 </html>
