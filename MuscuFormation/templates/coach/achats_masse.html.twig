@@ -1,0 +1,51 @@
+<h1>Achats pour le programme Prise de Masse</h1>
+<table>
+    <thead>
+        <tr>
+            <th>ID Achat</th>
+            <th>Email Utilisateur</th>
+            <th>Date Achat</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for achat in achatsMasse %}
+            <tr>
+                <td>{{ achat.id }}</td>
+                <td>{{ achat.utilisateur.email }}</td>
+                <td>{{ achat.dateAchat|date('d/m/Y') }}</td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3">Aucun achat trouvé pour ce programme.</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #0a0a0a;
+        color: white;
+        padding: 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        background-color: #2e2e2e;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    table th, table td {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid #404040;
+    }
+
+    table th {
+        background-color: #5cd65c;
+        color: black;
+    }
+</style>

@@ -4,6 +4,7 @@
 namespace App\Controller;
 
 use App\Entity\Utilisateur;
+use App\Entity\Achat;
 use App\Service\JwtTokenService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -42,16 +43,30 @@ class LoginController extends AbstractController
                 // Authentification réussie, génération du jeton JWT
                 $jwtToken = $this->jwtTokenService->createToken($utilisateur);
 
-                // Ajouter le jeton JWT dans la session (stocké sous forme de chaîne)
-                $request->getSession()->set('jwt_token', $jwtToken->getToken());  // Utiliser getToken()
+                // Ajouter le jeton JWT dans la session
+                $request->getSession()->set('jwt_token', $jwtToken->getToken());
 
-                // Vous pouvez aussi stocker l'utilisateur dans la session si nécessaire
+                // Ajouter l'utilisateur dans la session
                 $request->getSession()->set('user', [
                     'id' => $utilisateur->getId(),
                     'email' => $utilisateur->getEmail(),
                     'roles' => $utilisateur->getRole(),
                 ]);
-                // Redirection vers la page des formations après login
+
+
+                                // Vérifier si le rôle est `2` (Coach)
+                                if ($utilisateur->getRole() === 2) {
+                                    return $this->redirectToRoute('coach_dashboard');
+                                }
+                
+                // Vérifier si l'utilisateur a un achat
+                $achat = $entityManager->getRepository(Achat::class)->findOneBy(['utilisateur' => $utilisateur]);
+                if ($achat) {
+                    return $this->redirectToRoute('InfoPayment');
+                }
+
+
+                // Redirection par défaut vers la page des programmes
                 return $this->redirectToRoute('programmes');
             } else {
                 // Identifiants incorrects

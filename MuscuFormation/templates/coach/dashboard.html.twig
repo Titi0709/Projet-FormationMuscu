@@ -1,0 +1,47 @@
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #0a0a0a;
+        color: white;
+        padding: 20px;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    h1 {
+        text-align: center;
+        color: #5cd65c;
+    }
+
+    ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    ul li {
+        margin: 10px 0;
+    }
+
+    ul li a {
+        color: #5cd65c;
+        text-decoration: none;
+        font-size: 18px;
+    }
+
+    ul li a:hover {
+        color: #45b345;
+    }
+</style>
+
+<div class="container">
+    <h1>Tableau de bord des Coaches</h1>
+    <ul>
+        <li><a href="{{ path('coach_utilisateurs') }}">Voir tous les coaches</a></li>
+        <li><a href="{{ path('coach_achats_masse') }}">Voir les achats pour le programme Masse</a></li>
+        <li><a href="{{ path('coach_achats_seche') }}">Voir les achats pour le programme Seche</a></li>
+    </ul>
+</div>
