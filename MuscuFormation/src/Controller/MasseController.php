@@ -8,48 +8,26 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Service\JwtTokenService;
-use App\Entity\Programme; // Import correct
+use App\Entity\Programme;
+use App\Entity\Avis;
+use App\Entity\Achat;
+use App\Entity\Utilisateur;
 
 class MasseController extends AbstractController
 {
-    private JwtTokenService $jwtTokenService;
-
-    public function __construct(JwtTokenService $jwtTokenService)
+    /**
+     * Récupère l'utilisateur connecté depuis la session et la base de données.
+     */
+    private function getSessionUser(Request $request, EntityManagerInterface $entityManager): ?Utilisateur
     {
-        $this->jwtTokenService = $jwtTokenService;
-    }
+        $userData = $request->getSession()->get('user');
 
-    public function index(Request $request, EntityManagerInterface $entityManager): Response
-    {
-        // Déboguer la session pour vérifier si le jeton est bien stocké
-        $request->getSession()->all(); // À retirer après débogage
-
-        // Récupération du jeton JWT dans la session
-        $jwtToken = $request->getSession()->get('jwt_token');
-        
-        if (!$jwtToken) {
-            return $this->redirectToRoute('login');
+        if (is_array($userData) && isset($userData['id'])) {
+            // Recharger l'utilisateur depuis la base de données
+            return $entityManager->getRepository(Utilisateur::class)->find($userData['id']);
         }
 
-        // Vérifier que le jeton est une chaîne de caractères
-        if (!is_string($jwtToken)) {
-            return $this->redirectToRoute('login');
-        }
-
-        // Valider le jeton JWT
-        $jwtTokenEntity = $this->jwtTokenService->validateToken($jwtToken);
-
-        if (!$jwtTokenEntity || !$jwtTokenEntity->getUtilisateur()) {
-            return $this->redirectToRoute('login');
-        }
-
-        // Décoder le JWT et obtenir l'utilisateur associé
-        $utilisateur = $this->jwtTokenService->decodeJwt($jwtTokenEntity->getToken());
-
-        if (!$utilisateur) {
-            return $this->redirectToRoute('login');
-        }
+        return null;
     }
 
     #[Route('/Masse/programme/{id}', name: 'Masse_programme')]
@@ -61,62 +39,56 @@ class MasseController extends AbstractController
             throw $this->createNotFoundException('Programme non trouvé');
         }
 
+        $avisList = $entityManager->getRepository(Avis::class)->findBy(['programme' => $programme]);
+
         return $this->render('Masse/programme_detail.html.twig', [
             'programme' => $programme,
+            'avisList' => $avisList,
         ]);
     }
 
     #[Route('/Masse/programme/{id}/ajouter-avis', name: 'Masse_ajouter_avis')]
     public function addReview(Request $request, $id, EntityManagerInterface $entityManager): Response
     {
-        $avisContent = $request->request->get('avis');  // On suppose que l'avis est envoyé via POST
-        
-        if (!$avisContent) {
-            $this->addFlash('error', 'Avis non fourni.');
+        $commentaire = $request->request->get('commentaire');
+        $note = $request->request->get('note');
+    
+        if (!$commentaire || !$note) {
+            $this->addFlash('error', 'Veuillez fournir un commentaire et une note.');
             return $this->redirectToRoute('Masse_programme', ['id' => $id]);
         }
-
+    
         $programme = $entityManager->getRepository(Programme::class)->find($id);
-        
+    
         if (!$programme) {
             throw $this->createNotFoundException('Programme non trouvé');
         }
-
+    
+        // Récupérer l'utilisateur depuis la session et la base de données
+        $utilisateur = $this->getSessionUser($request, $entityManager);
+    
+        if (!$utilisateur) {
+            throw $this->createAccessDeniedException('Vous devez être connecté pour ajouter un avis.');
+        }
+    
+        // Créer et lier l'avis
         $avis = new Avis();
-        $avis->setContenu($avisContent);
+        $avis->setCommentaire($commentaire);
+        $avis->setNote((int) $note);
+        $avis->setDateAvis(new \DateTime());
         $avis->setProgramme($programme);
-        $avis->setUtilisateur($this->getUser());  // Supposons que l'utilisateur est stocké
-
+        $avis->setUtilisateur($utilisateur);
+    
+        // Persister uniquement l'avis, pas l'utilisateur
         $entityManager->persist($avis);
         $entityManager->flush();
-
+    
         $this->addFlash('success', 'Avis ajouté avec succès.');
         return $this->redirectToRoute('Masse_programme', ['id' => $id]);
     }
 
-    #[Route('/Masse/avis/{id}/supprimer', name: 'Masse_supprimer_avis')]
-    public function deleteReview($id, EntityManagerInterface $entityManager): Response
-    {
-        $avis = $entityManager->getRepository(Avis::class)->find($id);
-
-        if (!$avis) {
-            throw $this->createNotFoundException('Avis non trouvé');
-        }
-
-        // Vérifiez que l'utilisateur actuel a bien le droit de supprimer cet avis
-        if ($avis->getUtilisateur() !== $this->getUser()) {
-            throw $this->createAccessDeniedException();
-        }
-
-        $entityManager->remove($avis);
-        $entityManager->flush();
-
-        $this->addFlash('success', 'Avis supprimé avec succès.');
-        return $this->redirectToRoute('Masse_programme', ['id' => $avis->getProgramme()->getId()]);
-    }
-
-    #[Route('/Masse/programme/{id}/payer', name: 'Masse_payer_programme')]
-    public function payment(Request $request, $id, EntityManagerInterface $entityManager): Response
+    #[Route('/Masse/programme/{id}/acheter', name: 'Masse_acheter_programme')]
+    public function purchaseProgramme(Request $request, $id, EntityManagerInterface $entityManager): Response
     {
         $programme = $entityManager->getRepository(Programme::class)->find($id);
 
@@ -124,23 +96,24 @@ class MasseController extends AbstractController
             throw $this->createNotFoundException('Programme non trouvé');
         }
 
-        // Supposons que le paiement a été validé par un système externe
-        $paymentSuccess = $request->request->get('payment_success');  // Vaut true ou false
-        
-        if ($paymentSuccess) {
-            $payment = new Payment();
-            $payment->setProgramme($programme);
-            $payment->setUtilisateur($this->getUser());
-            $payment->setMontant($programme->getPrix());  // Si vous avez un prix dans le programme
+        // Récupérer l'utilisateur depuis la session et la base de données
+        $utilisateur = $this->getSessionUser($request, $entityManager);
 
-            $entityManager->persist($payment);
-            $entityManager->flush();
-
-            $this->addFlash('success', 'Paiement effectué avec succès.');
-        } else {
-            $this->addFlash('error', 'Le paiement a échoué. Veuillez réessayer.');
+        if (!$utilisateur) {
+            throw $this->createAccessDeniedException('Vous devez être connecté pour effectuer un achat.');
         }
 
+        // Créer l'achat
+        $achat = new Achat();
+        $achat->setProgramme($programme);
+        $achat->setUtilisateur($utilisateur);
+        $achat->setDateAchat(new \DateTime());
+
+        // Persister l'achat
+        $entityManager->persist($achat);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Programme acheté avec succès.');
         return $this->redirectToRoute('Masse_programme', ['id' => $id]);
     }
 }

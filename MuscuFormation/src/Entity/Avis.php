@@ -23,9 +23,11 @@ class Avis
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $date_avis = null;
 
-    #[ORM\ManyToOne(targetEntity: Utilisateur::class, cascade: ['remove'])]
-    #[ORM\JoinColumn(nullable: false, onDelete: "CASCADE")]
+    #[ORM\ManyToOne(targetEntity: Utilisateur::class)]
+    #[ORM\JoinColumn(nullable: false)]
     private ?Utilisateur $utilisateur = null;
+    
+    
 
     #[ORM\ManyToOne(targetEntity: Programme::class, cascade: ['remove'])]
     #[ORM\JoinColumn(nullable: false, onDelete: "CASCADE")]

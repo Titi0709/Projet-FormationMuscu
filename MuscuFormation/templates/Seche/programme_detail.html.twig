@@ -1,25 +1,152 @@
-{# templates/Seche/formation_detail.html.twig #}
+<style>
+    /* Style global pour le fond de la page */
+    body {
+        margin: 0;
+        padding: 20px;
+        background-color: #0a0a0a; /* Fond noir profond */
+        font-family: Arial, sans-serif;
+        color: white;
+    }
 
-<h1>Formation: {{ programme.nom }}</h1>  {# Utilisez 'programme' au lieu de 'formation' #}
-<p>{{ programme.description }}</p>
-<p>Prix: {{ programme.prix }}€</p>
+    /* Conteneur principal */
+    .programme-wrapper {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #2e2e2e; /* Fond gris foncé */
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    }
 
-<h2>Avis</h2>
-{% for avis in programme.avis %}
-    <div>
-        <p><strong>{{ avis.utilisateur.username }}:</strong> {{ avis.contenu }}</p>
-        <a href="{{ path('Seche_supprimer_avis', {'id': avis.id}) }}">Supprimer</a>
+    /* Titre principal */
+    h1 {
+        text-align: center;
+        font-size: 28px;
+        color: #5cd65c; /* Vert clair */
+        margin-bottom: 20px;
+    }
+
+    /* Description et détails */
+    p {
+        font-size: 16px;
+        margin: 10px 0;
+    }
+
+    /* Section Avis */
+    h2 {
+        font-size: 22px;
+        color: #5cd65c;
+        margin-top: 30px;
+        border-bottom: 2px solid #5cd65c;
+        padding-bottom: 5px;
+    }
+
+    .avis {
+        margin-top: 15px;
+        padding: 10px;
+        background-color: #404040; /* Fond légèrement plus clair */
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .avis p {
+        margin: 5px 0;
+        font-size: 14px;
+    }
+
+    .avis strong {
+        color: #5cd65c;
+    }
+
+    /* Formulaire pour ajouter un avis */
+    form {
+        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    textarea, select {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #5cd65c;
+        border-radius: 4px;
+        background-color: #333333;
+        color: white;
+        font-size: 14px;
+    }
+
+    button {
+        padding: 10px;
+        font-size: 16px;
+        color: #ffffff;
+        background-color: #5cd65c;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    button:hover {
+        background-color: #45b345; /* Vert foncé au survol */
+    }
+
+    /* Section paiement */
+    h3 {
+        font-size: 20px;
+        color: #5cd65c;
+        margin-top: 30px;
+    }
+</style>
+
+<div class="programme-wrapper">
+    <h1>Programme : {{ programme.titre }}</h1>
+    <p>Description : {{ programme.description }}</p>
+    <p>Prix : {{ programme.prix }} €</p>
+    <p>Durée : {{ programme.duree }} jours</p>
+
+    <h2>Avis :</h2>
+    {% for avis in avisList %}
+        <div class="avis">
+            <p><strong>{{ avis.utilisateur.email }} :</strong> {{ avis.commentaire }}</p>
+            <p>Note : {{ avis.note }}/5</p>
+            <p>Le {{ avis.dateAvis|date('d/m/Y') }}</p>
+        </div>
+    {% else %}
+        <p>Aucun avis pour ce programme.</p>
+    {% endfor %}
+
+    <h3>Ajouter un avis :</h3>
+    <form method="POST" action="{{ path('Seche_ajouter_avis', {id: programme.id}) }}">
+        <textarea name="commentaire" required placeholder="Écrivez votre avis ici..."></textarea>
+        <label for="note">Note :</label>
+        <select name="note">
+            {% for i in 1..5 %}
+                <option value="{{ i }}">{{ i }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Envoyer</button>
+    </form>
+
+    <h3>Procéder au paiement :</h3>
+    <form method="POST" action="{{ path('Seche_acheter_programme', {id: programme.id}) }}">
+        <button type="submit">Acheter</button>
+    </form>
+
+    <div style="margin-top: 30px; text-align: center;">
+        <a href="{{ path('programmes') }}" style="text-decoration: none;">
+            <button style="
+                padding: 10px 20px;
+                font-size: 16px;
+                color: #ffffff;
+                background-color: #d9534f; /* Rouge */
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                transition: background-color 0.3s;
+            " onmouseover="this.style.backgroundColor='#c9302c';" onmouseout="this.style.backgroundColor='#d9534f';">
+                Revenir à la liste des programmes
+            </button>
+        </a>
     </div>
-{% endfor %}
-
-<h3>Ajouter un avis</h3>
-<form action="{{ path('Seche_ajouter_avis', {'id': programme.id}) }}" method="POST">
-    <textarea name="avis" required></textarea>
-    <button type="submit">Ajouter un avis</button>
-</form>
-
-<h3>Payer la formation</h3>
-<form action="{{ path('Seche_payer_formation', {'id': programme.id}) }}" method="POST">
-    <input type="hidden" name="payment_success" value="true" />  {# Remplacez cette logique avec votre système de paiement #}
-    <button type="submit">Payer maintenant</button>
-</form>
+</div>

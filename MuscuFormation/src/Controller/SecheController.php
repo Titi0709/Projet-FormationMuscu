@@ -8,41 +8,26 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Service\JwtTokenService;
 use App\Entity\Programme;
-use App\Entity\Achat;
 use App\Entity\Avis;
+use App\Entity\Achat;
+use App\Entity\Utilisateur;
 
 class SecheController extends AbstractController
 {
-    private JwtTokenService $jwtTokenService;
-
-    public function __construct(JwtTokenService $jwtTokenService)
+    /**
+     * Récupère l'utilisateur connecté depuis la session et la base de données.
+     */
+    private function getSessionUser(Request $request, EntityManagerInterface $entityManager): ?Utilisateur
     {
-        $this->jwtTokenService = $jwtTokenService;
-    }
+        $userData = $request->getSession()->get('user');
 
-    public function index(Request $request, EntityManagerInterface $entityManager): Response
-    {
-        $request->getSession()->all(); // Débogage (à retirer plus tard)
-
-        $jwtToken = $request->getSession()->get('jwt_token');
-        
-        if (!$jwtToken || !is_string($jwtToken)) {
-            return $this->redirectToRoute('login');
+        if (is_array($userData) && isset($userData['id'])) {
+            // Recharger l'utilisateur depuis la base de données
+            return $entityManager->getRepository(Utilisateur::class)->find($userData['id']);
         }
 
-        $jwtTokenEntity = $this->jwtTokenService->validateToken($jwtToken);
-
-        if (!$jwtTokenEntity || !$jwtTokenEntity->getUtilisateur()) {
-            return $this->redirectToRoute('login');
-        }
-
-        $utilisateur = $this->jwtTokenService->decodeJwt($jwtTokenEntity->getToken());
-
-        if (!$utilisateur) {
-            return $this->redirectToRoute('login');
-        }
+        return null;
     }
 
     #[Route('/Seche/programme/{id}', name: 'Seche_programme')]
@@ -54,57 +39,50 @@ class SecheController extends AbstractController
             throw $this->createNotFoundException('Programme non trouvé');
         }
 
+        $avisList = $entityManager->getRepository(Avis::class)->findBy(['programme' => $programme]);
+
         return $this->render('Seche/programme_detail.html.twig', [
             'programme' => $programme,
+            'avisList' => $avisList,
         ]);
     }
 
     #[Route('/Seche/programme/{id}/ajouter-avis', name: 'Seche_ajouter_avis')]
     public function addReview(Request $request, $id, EntityManagerInterface $entityManager): Response
     {
-        $avisContent = $request->request->get('avis');
-        
-        if (!$avisContent) {
-            $this->addFlash('error', 'Avis non fourni.');
+        $commentaire = $request->request->get('commentaire');
+        $note = $request->request->get('note');
+
+        if (!$commentaire || !$note) {
+            $this->addFlash('error', 'Veuillez fournir un commentaire et une note.');
             return $this->redirectToRoute('Seche_programme', ['id' => $id]);
         }
 
         $programme = $entityManager->getRepository(Programme::class)->find($id);
-        
+
         if (!$programme) {
             throw $this->createNotFoundException('Programme non trouvé');
         }
 
+        // Récupérer l'utilisateur depuis la session et la base de données
+        $utilisateur = $this->getSessionUser($request, $entityManager);
+
+        if (!$utilisateur) {
+            throw $this->createAccessDeniedException('Vous devez être connecté pour ajouter un avis.');
+        }
+
         $avis = new Avis();
-        $avis->setContenu($avisContent);
+        $avis->setCommentaire($commentaire);
+        $avis->setNote((int)$note);
+        $avis->setDateAvis(new \DateTime());
         $avis->setProgramme($programme);
-        $avis->setUtilisateur($this->getUser());
+        $avis->setUtilisateur($utilisateur);
 
         $entityManager->persist($avis);
         $entityManager->flush();
 
         $this->addFlash('success', 'Avis ajouté avec succès.');
         return $this->redirectToRoute('Seche_programme', ['id' => $id]);
-    }
-
-    #[Route('/Seche/avis/{id}/supprimer', name: 'Seche_supprimer_avis')]
-    public function deleteReview($id, EntityManagerInterface $entityManager): Response
-    {
-        $avis = $entityManager->getRepository(Avis::class)->find($id);
-
-        if (!$avis) {
-            throw $this->createNotFoundException('Avis non trouvé');
-        }
-
-        if ($avis->getUtilisateur() !== $this->getUser()) {
-            throw $this->createAccessDeniedException();
-        }
-
-        $entityManager->remove($avis);
-        $entityManager->flush();
-
-        $this->addFlash('success', 'Avis supprimé avec succès.');
-        return $this->redirectToRoute('Seche_programme', ['id' => $avis->getProgramme()->getId()]);
     }
 
     #[Route('/Seche/programme/{id}/acheter', name: 'Seche_acheter_programme')]
@@ -116,22 +94,22 @@ class SecheController extends AbstractController
             throw $this->createNotFoundException('Programme non trouvé');
         }
 
-        $achatSuccess = $request->request->get('achat_success');
-        
-        if ($achatSuccess) {
-            $achat = new Achat();
-            $achat->setProgramme($programme);
-            $achat->setUtilisateur($this->getUser());
-            $achat->setMontant($programme->getPrix());
+        // Récupérer l'utilisateur depuis la session et la base de données
+        $utilisateur = $this->getSessionUser($request, $entityManager);
 
-            $entityManager->persist($achat);
-            $entityManager->flush();
-
-            $this->addFlash('success', 'Achat effectué avec succès.');
-        } else {
-            $this->addFlash('error', 'L\'achat a échoué. Veuillez réessayer.');
+        if (!$utilisateur) {
+            throw $this->createAccessDeniedException('Vous devez être connecté pour effectuer un achat.');
         }
 
+        $achat = new Achat();
+        $achat->setProgramme($programme);
+        $achat->setUtilisateur($utilisateur);
+        $achat->setDateAchat(new \DateTime());
+
+        $entityManager->persist($achat);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Programme acheté avec succès.');
         return $this->redirectToRoute('Seche_programme', ['id' => $id]);
     }
 }

@@ -46,8 +46,11 @@ class LoginController extends AbstractController
                 $request->getSession()->set('jwt_token', $jwtToken->getToken());  // Utiliser getToken()
 
                 // Vous pouvez aussi stocker l'utilisateur dans la session si nécessaire
-                $request->getSession()->set('user', $utilisateur);
-
+                $request->getSession()->set('user', [
+                    'id' => $utilisateur->getId(),
+                    'email' => $utilisateur->getEmail(),
+                    'roles' => $utilisateur->getRole(),
+                ]);
                 // Redirection vers la page des formations après login
                 return $this->redirectToRoute('programmes');
             } else {
