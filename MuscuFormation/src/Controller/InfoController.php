@@ -1,5 +1,5 @@
 <?php
-// src/Controller/InfoController.php
+
 
 namespace App\Controller;
 
@@ -16,7 +16,7 @@ class InfoController extends AbstractController
     #[Route('/info', name: 'InfoPayment')]
     public function info(EntityManagerInterface $entityManager, Request $request): Response
     {
-        // Récupérer l'utilisateur depuis la session
+        // Récupére utilisateur  session
         $userData = $request->getSession()->get('user');
 
         if (!$userData || !isset($userData['id'])) {
@@ -24,13 +24,13 @@ class InfoController extends AbstractController
             return $this->redirectToRoute('login');
         }
 
-        // Charger l'utilisateur depuis la base de données
+        // Charger utilisateur  base de données
         $utilisateur = $entityManager->getRepository(Utilisateur::class)->find($userData['id']);
         if (!$utilisateur) {
             throw $this->createNotFoundException('Utilisateur non trouvé.');
         }
 
-        // Récupérer l'achat de l'utilisateur
+        // Récupére achat USER
         $achats = $entityManager->getRepository(Achat::class)->findBy(['utilisateur' => $utilisateur]);
 
         return $this->render('info/payment_info.html.twig', [

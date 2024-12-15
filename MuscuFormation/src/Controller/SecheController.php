@@ -1,5 +1,5 @@
 <?php
-// src/Controller/SecheController.php
+
 
 namespace App\Controller;
 
@@ -15,15 +15,13 @@ use App\Entity\Utilisateur;
 
 class SecheController extends AbstractController
 {
-    /**
-     * Récupère l'utilisateur connecté depuis la session et la base de données.
-     */
+    
     private function getSessionUser(Request $request, EntityManagerInterface $entityManager): ?Utilisateur
     {
         $userData = $request->getSession()->get('user');
 
         if (is_array($userData) && isset($userData['id'])) {
-            // Recharger l'utilisateur depuis la base de données
+            // Recharger UTI DB
             return $entityManager->getRepository(Utilisateur::class)->find($userData['id']);
         }
 
@@ -64,7 +62,7 @@ class SecheController extends AbstractController
             throw $this->createNotFoundException('Programme non trouvé');
         }
 
-        // Récupérer l'utilisateur depuis la session et la base de données
+        
         $utilisateur = $this->getSessionUser($request, $entityManager);
 
         if (!$utilisateur) {
@@ -94,7 +92,7 @@ class SecheController extends AbstractController
             throw $this->createNotFoundException('Programme non trouvé');
         }
 
-        // Récupérer l'utilisateur depuis la session et la base de données
+       
         $utilisateur = $this->getSessionUser($request, $entityManager);
 
         if (!$utilisateur) {

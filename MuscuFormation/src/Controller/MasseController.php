@@ -1,5 +1,5 @@
 <?php
-// src/Controller/MasseController.php
+
 
 namespace App\Controller;
 
@@ -15,15 +15,13 @@ use App\Entity\Utilisateur;
 
 class MasseController extends AbstractController
 {
-    /**
-     * Récupère l'utilisateur connecté depuis la session et la base de données.
-     */
+
     private function getSessionUser(Request $request, EntityManagerInterface $entityManager): ?Utilisateur
     {
         $userData = $request->getSession()->get('user');
 
         if (is_array($userData) && isset($userData['id'])) {
-            // Recharger l'utilisateur depuis la base de données
+            // Recharger uti depuis DB
             return $entityManager->getRepository(Utilisateur::class)->find($userData['id']);
         }
 
@@ -64,14 +62,14 @@ class MasseController extends AbstractController
             throw $this->createNotFoundException('Programme non trouvé');
         }
     
-        // Récupérer l'utilisateur depuis la session et la base de données
+        // Récupére Uti session et db
         $utilisateur = $this->getSessionUser($request, $entityManager);
     
         if (!$utilisateur) {
             throw $this->createAccessDeniedException('Vous devez être connecté pour ajouter un avis.');
         }
     
-        // Créer et lier l'avis
+        
         $avis = new Avis();
         $avis->setCommentaire($commentaire);
         $avis->setNote((int) $note);
@@ -96,7 +94,7 @@ class MasseController extends AbstractController
             throw $this->createNotFoundException('Programme non trouvé');
         }
 
-        // Récupérer l'utilisateur depuis la session et la base de données
+        
         $utilisateur = $this->getSessionUser($request, $entityManager);
 
         if (!$utilisateur) {

@@ -1,6 +1,6 @@
 <?php
 
-// Controller RegistrationController.php
+
 
 namespace App\Controller;
 
@@ -24,7 +24,7 @@ class RegistrationController extends AbstractController
         $utilisateur = new Utilisateur();
 
            // Définir le rôle par défaut
-    $utilisateur->setRole(1);
+         $utilisateur->setRole(1);
 
 
         // Création du formulaire

@@ -1,5 +1,5 @@
 <?php
-// src/Controller/CoachController.php
+
 
 namespace App\Controller;
 
@@ -16,14 +16,14 @@ class CoachController extends AbstractController
     #[Route('/Coach', name: 'coach_dashboard')]
     public function dashboard(): Response
     {
-        // Simple page de tableau de bord pour les coaches
+        
         return $this->render('coach/dashboard.html.twig');
     }
 
     #[Route('/Coach/utilisateurs', name: 'coach_utilisateurs', methods: ['GET'])]
     public function getCoaches(EntityManagerInterface $entityManager): Response
     {
-        // Récupérer tous les utilisateurs avec le rôle 2 (Coach)
+        // Récupére utilisateurs avec rôle 2 
         $coaches = $entityManager->getRepository(Utilisateur::class)->findBy(['role' => 2]);
 
         return $this->render('coach/utilisateurs.html.twig', [
@@ -34,7 +34,7 @@ class CoachController extends AbstractController
     #[Route('/Coach/achats/masse', name: 'coach_achats_masse', methods: ['GET'])]
     public function getMassePurchases(EntityManagerInterface $entityManager): Response
     {
-        // Récupérer tous les achats pour le programme Masse
+        // Récupérer  pour le programme Masse
         $programmeMasse = $entityManager->getRepository(Programme::class)->findOneBy(['titre' => 'Prise de Masse']);
         $achatsMasse = $programmeMasse
             ? $entityManager->getRepository(Achat::class)->findBy(['programme' => $programmeMasse])
@@ -48,7 +48,7 @@ class CoachController extends AbstractController
     #[Route('/Coach/achats/seche', name: 'coach_achats_seche', methods: ['GET'])]
     public function getSechePurchases(EntityManagerInterface $entityManager): Response
     {
-        // Récupérer tous les achats pour le programme Seche
+        // Récupérer le programme Seche
         $programmeSeche = $entityManager->getRepository(Programme::class)->findOneBy(['titre' => 'Seche']);
         $achatsSeche = $programmeSeche
             ? $entityManager->getRepository(Achat::class)->findBy(['programme' => $programmeSeche])

@@ -1,5 +1,5 @@
 <?php
-// src/Controller/LoginController.php
+
 
 namespace App\Controller;
 
@@ -36,7 +36,7 @@ class LoginController extends AbstractController
             $email = $form->get('email')->getData();
             $motDePasse = $form->get('mot_de_passe')->getData();
 
-            // Recherche de l'utilisateur dans la base de données
+            // Recherche UTI DB
             $utilisateur = $entityManager->getRepository(Utilisateur::class)->findOneBy(['email' => $email]);
 
             if ($utilisateur && password_verify($motDePasse, $utilisateur->getMotDePasse())) {
@@ -54,22 +54,22 @@ class LoginController extends AbstractController
                 ]);
 
 
-                                // Vérifier si le rôle est `2` (Coach)
+                                // VERIF ROLE 2
                                 if ($utilisateur->getRole() === 2) {
                                     return $this->redirectToRoute('coach_dashboard');
                                 }
                 
-                // Vérifier si l'utilisateur a un achat
+                // Vérifier UTI ACHAT
                 $achat = $entityManager->getRepository(Achat::class)->findOneBy(['utilisateur' => $utilisateur]);
                 if ($achat) {
                     return $this->redirectToRoute('InfoPayment');
                 }
 
 
-                // Redirection par défaut vers la page des programmes
+                
                 return $this->redirectToRoute('programmes');
             } else {
-                // Identifiants incorrects
+                
                 $this->addFlash('error', 'Adresse email ou mot de passe incorrect.');
             }
         }
